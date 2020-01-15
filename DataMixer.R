@@ -22,13 +22,37 @@ MData$Volume <- MData$Limb.Width*Limb.Length
       
       mmB <-subset(MData, unitsW == "mm" & unitsL == "mm")
       
-      
-      
+
+R.Limb.length <- round(Limb.Length, digits = 2)      
+R.Limb.width <- round(Limb.Width, digits = 2)
+New.unitsL <- ("cm")
+New.unitsW <- ("cm")
+Test <- data.frame(Species, R.Limb.width, New.unitsW, R.Limb.length, New.unitsL)
+
 
 #Plotting the limb length and width data
 library(ggplot2)
 library(stringr)
-qplot (x=Limb.Width, y= Limb.Length, MData = MData, binwidth = 1, 
-       xlab="Limb Width (cm)", ylab = "Limb Length (cm)", main = "Limb size comparison among feline species",
-       size = I(3), alpha =I(0.9))
+
+qplot (x=Limb.Width, y=Limb.Length, data = MData, 
+       xlab="Limb Width (cm)", ylab = "Limb Length (cm)", 
+        main = "Limb size comparison among feline species", 
+          size = I(3), alpha=I(0.9))
+
+qplot (x=Limb.Width, y=Limb.Length, data=MData,
+       xlab="Limb Width (cm)", ylab="Limb Length (cm)", 
+        main="Limb size comparison among feline species",
+          colour=I(rgb(0,0,0)),size = I(4), alpha =I(0.8), shape=I(16)) + theme_linedraw() + 
+            geom_point() + geom_text(aes(label=Species),hjust=-0.05, vjust=0.3) 
+
+install.packages("ggrepel")
+library(ggrepel)
+
+qplot (x=Limb.Width, y=Limb.Length, data=MData,
+       xlab="Limb Width (cm)", ylab="Limb Length (cm)", 
+        main="Limb size comparison among feline species",
+          colour=I(rgb(0,0,0)),size = I(4), alpha =I(0.8), shape=I(16)) + 
+              geom_label_repel(aes(label=Species), box.padding=  0.35, 
+                point.padding = 0.5, segment.color = 'grey50', force = 1, 
+                  max.iter = 2000)
        
