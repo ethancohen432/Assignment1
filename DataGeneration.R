@@ -1,4 +1,4 @@
-#Selected 10 randam species within the Order of Felidae
+#Selected 10 random species within the Order of Felidae
 Species <- c("Felis catus", "Puma concol", "Otocolobus manul","Ancinonyx jubatus",
              "Lynx canadensis","Leopardus paradalis", "Caracal caracal", 
              "Pardofelis badia", "Panthera leo", "Neofelis nebulosa")
