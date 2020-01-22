@@ -35,4 +35,3 @@ qplot (x=Limb.Width, y=Limb.Length, data=MyData,
               geom_label_repel(aes(label=Species), box.padding=  0.35, 
                 point.padding = 0.5, segment.color = 'grey50', force = 1, 
                   max.iter = 2000)
-       
