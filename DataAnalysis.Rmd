@@ -5,21 +5,24 @@ date: "20/01/2020"
 output: html_document
 ---
 
+
+I began by using the library function to load the downloaded packages which will be used throughout the assignment.
+
 ```{r, echo=FALSE, include=F}
 library(ggplot2)
 library(dplyr)
-
 ```
 
+Next, I created an object called MData which contains the read.csv of the measurements.csv file which was generated prior in the previous assignment. The measurements.csv contains data.frame of 10 different species, along with their randomly generated limb widths, limb lengths, and randomly assigned units of length (either mm or cm). Following that, the column names were changed into three letter abreviations
 
 ```{r, echo=FALSE}
-Species <- c("Felis catus", "Puma concol", "Otocolobus manul","Ancinonyx jubatus",
-             "Lynx canadensis","Leopardus paradalis", "Caracal caracal", 
-             "Pardofelis badia", "Panthera leo", "Neofelis nebulosa")
-
 MData <- read.csv("measurements.csv")
 MData <- MData %>% rename(IDs = X, Spe = Species, LiW = Limb.Width, UnW = unitsW, LiL = Limb.Length, UnL = unitsL)
+```
 
+Following that, I used a for loop to standardize the units of limb width and length to cm. Within the loop, there is also a command which converts the values of the limb width or length to cm by dividing that value by 10.
+
+```{r, echo=FALSE}
 for (i in 1:length(MData$UnW)){
   if (MData$UnW[i] == "mm"){
     MData$LiW[i] = MData$LiW[i]/10
@@ -33,39 +36,46 @@ for (i in 1:length(MData$UnL)){
     MData$UnL[i] = "cm"
   }
 }
-MData <- mutate(MData, Volume = pi*(MData$LiW/2)^2*LiL)
-
-qplot (x=LiW, y=LiL, data=MData, xlab="Limb Width (cm)", ylab="Limb Length (cm)", main="Limb size comparison among feline species", colour=I(rgb(0,0,1)),size = I(4), alpha =I(0.8), shape=I(16))
-
-
 ```
 
-Plot 1. Depicts the limb length(cm) plotted against the limb width (cm) of 10 species within the taxonimic family of felinae.
-
+In this next section, I utilized the dplyr package to mutate MData (data.frame), effectively adding a new column to the data set called "Volume". The volume was calculated using the formula of a cylinder $(pi*r^2*L)$ with r being half of the limb width, and the L being the limb length. The length and width of each of the 10 species was then plotted as seen below.
 
 ```{r, echo=FALSE}
-mean(MData$Volume)
-Big_MData <- subset(MData, Volume >11620.54)
+Volume <- pi*(MData$LiW/2)^2*MData$LiL
+MData <- mutate(MData, Volume = pi*(MData$LiW/2)^2*MData$LiL)
+
+qplot (x=LiW, y=LiL, data=MData, xlab="Limb Width (cm)", ylab="Limb Length (cm)", main="Limb size comparison among feline species", colour=I(rgb(0,0,1)),size = I(4), alpha =I(0.8), shape=I(16))
+```
+
+Plot 1. Depicts the limb length(cm) plotted against the limb width (cm) of 10 species within the taxonimic family of felineae.
+
+#### Feline Species With a Above Average Limb Volume
+
+In this next section, I utilized the filter function to subset my the species data into a new object called Big_MData. This subset possesses only the species which have a limb volume which is above the mean volume of all 10 species. This new subset of the original data possesses 2 species which were then plotted as seen below. 
+
+```{r, echo=FALSE}
+Big_MData <- filter(MData, Volume > mean(MData$Volume))
 qplot(x=LiW, y=LiL, data=Big_MData,xlab="Limb Width (cm)", ylab="Limb Length (cm)", main="Limb size comparison among feline species which have an above average volume", colour=I(rgb(0,0,1)),size = I(4), alpha =I(0.8), shape=I(16))
 ```
 
-Plot 1. Depicts the limb length(cm) plotted against the limb width (cm) of 2 species with an above average (>11620.54cm^2) limb volume the taxonimic family of felineae.
+Plot 2. Depicts the limb length(cm) plotted against the limb width (cm) of 2 species with an above average limb volume.
+
+#### Feline Species With a Below Average Limb Volume
+
+Here, I utilized the filter function once again to subset my the species data into a new object called Small_MData. This subset possesses only the species which have a limb volume which is below the mean volume of all 10 species. This new subset of the original data possesses 8 species of the original 10. I then used group_by to turn this data into a tibble which was printed as seen in the table below.
+
+Table 1. Displays the species of the family felineae with a below average limb volume. The average was obtained from the limb volumes of the 10 species used to in plot 1.
+
+```{r, echo=FALSE}
+Small_MData <- filter(MData, Volume < mean(MData$Volume))
+
+Table2 <- group_by(Small_MData, Spe)
+
+print(Table2)
+```
 
 
-## Feline Species With a Below Average Limb Volume
-Table 1. Displays the species of the family felineae with a below average (<11620.54cm^2) limb volume. The average was obtained from the limb volumes of the 10 species used to in plot 1.
-
-Species | Volume (cm^2)
-----|----
-Felis catus | 432.55
-Puma concol | 10495.96
-Otocolobus manul | 18.40
-Lynx canadensis | 2.70
-Leopardus paradalis | 68.40
-Caracal caracal | 383.90
-Panthera leo | 4367.5
-Neofelis nebulosa | 0.14
-
+Next, I used the rbinom function to generate 10 values, being either a 1 or a 0. I added 1 to each of the values and assigned the class "Spots" to all of the 1's and the class "Stripes" to all of the 2's. Using the mutate function, I added in a new column called Fur_Pattern which possesses the 10 randomly generated classes (either Stripes or Spots). 
 
 ```{r, echo=FALSE}
 #New column called Fur_Pattern
@@ -74,13 +84,20 @@ type <- c("Spots", "Stripes")
 Fur_Pattern <- type[Furi]
 
 MData <- mutate(MData, Fur_Pattern = Fur_Pattern)
+```
 
+#### Summary Statistics of Feline Limb Width, Length, and Volume
+
+In this last section, I created an object called MD_Fur which contains a tibble of the original MData and the newly added Fur_Pattern column. With this tibble, I was able to generate summary statistics on the limb volumes, widths, and lengths which I then printed and can be seen below.
+
+
+Table 2. Displays the means and standard deviations of the limb widths, lengths, and volumes of the 10 species. 
+```{r, echo=FALSE}
 MD_Fur <- group_by(MData,Fur_Pattern)
 
-Table1 <- summarise(MD_Fur, Avg_Length=mean(LiL), Sd_Length=sd(LiL), Avg_Width=mean(LiW), d_Width=sd(LiW))
+Table2 <- summarise(MD_Fur, Avg_Length=mean(LiL), Sd_Length=sd(LiL), Avg_Width=mean(LiW), d_Width=sd(LiW), Avg_Volume=mean(Volume), Sd_Volume=sd(Volume))
 
-View(Table1)
-
+print(Table2)
 ```
 
 
