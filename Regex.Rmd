@@ -1,0 +1,28 @@
+---
+title: "Regex"
+author: "Ethan Cohen"
+date: "27/01/2020"
+output: html_document
+---
+
+#### First I started out by loading and attaching the dplyr package which will be used throughout this script.
+```{r, echo=TRUE, include=F}
+library(dplyr)
+?library
+```
+
+#### Through the use of the dplyr function, 'mutate()' and the 'sub' regular expression, a new column was created called "Sp" which modifies a Species name of that row to possess only the first letter of its Genus, followed by a period.
+```{r, echo=TRUE}
+MData<-read.csv("measurements.csv")
+NMData <- mutate(MData, Sp = sub("\\B[a-z]+", ".", MData$Sp))
+print(NMData)
+```
+
+#### In this next section, a new dataset called "NewMData" was created with the use of the dplyr package. The script written below specifies the ordering of the new dataset (with the Sp coloumn being first) and removes the Species column all together. This effectively allows the Sp coloumn to replace the original Species column.
+
+```{r, echo=TRUE}
+NewMData <- select(NMData, X, Sp, Limb.Width, unitsW, Limb.Length, unitsL,-Species)
+print(NewMData)
+```
+
+
